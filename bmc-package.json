@@ -2,9 +2,14 @@
   "schema": 1,
   "id": "15b746d7-7b0d-4556-89c8-d88078a3117a",
   "type": "toolplugin",
-  "name": "BMCShell Redfish",
+  "publisher": "bmcshell",
+  "shortName": "redfish",
+  "name": "bmcshell-tool-redfish",
+  "displayName": "BMCShell Redfish",
+  "description": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
   "summary": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "repository": "https://github.com/BMCShell/bmcshell-tool-redfish",
   "coreApi": 1,
   "platforms": [
     "windows-amd64"
