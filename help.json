@@ -1,0 +1,46 @@
+{
+  "topics": {
+    "package": {
+      "summary": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
+      "usage": [
+        "bmc use <IPv4>",
+        "bmc tool redfish"
+      ],
+      "examples": [
+        {
+          "command": "bmc tool redfish",
+          "description": "查看详细说明和示例。"
+        }
+      ],
+      "notes": [
+        "使用 redfish --auth 为当前目标交互配置会话凭据。",
+        "本工具遵循 BMCShell 的 SOCKS5 代理设置。"
+      ]
+    },
+    "tool.redfish": {
+      "summary": "向当前 BMC 的 Redfish 服务发送请求。",
+      "usage": [
+        "redfish GET /redfish/v1/...",
+        "redfish POST|PATCH|DELETE /redfish/v1/... [JSON|@文件]",
+        "redfish --auth [--tls-insecure|--clear]"
+      ],
+      "options": [],
+      "examples": [
+        {
+          "command": "redfish GET /redfish/v1/Managers",
+          "description": "读取管理器集合。"
+        },
+        {
+          "command": "redfish PATCH /redfish/v1/Managers/1 @request.json",
+          "description": "从文件读取请求体并发送修改请求。"
+        }
+      ],
+      "notes": [
+        "方法使用大写。路径限定在当前目标的 /redfish/v1/。GET 只接收路径。",
+        "终端输出响应体。非 2xx HTTP 响应保留错误状态和响应内容。",
+        "用户名和密码通过 curl 的标准输入传递。HTTPS 默认证书校验。",
+        "认证配置保存在当前会话内存。--clear 清除已配置凭据。"
+      ]
+    }
+  }
+}

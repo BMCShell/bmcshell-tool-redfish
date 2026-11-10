@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "15b746d7-7b0d-4556-89c8-d88078a3117a",
+  "type": "toolplugin",
+  "name": "BMCShell Redfish",
+  "summary": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
+  "version": "1.0.0",
+  "coreApi": 1,
+  "platforms": [
+    "windows-amd64"
+  ],
+  "help": "help.json",
+  "changelog": "changelog.json",
+  "assets": [
+    "tool/compat/common.sh",
+    "tool/compat/redfish.sh",
+    "tool/compat/transport.sh",
+    "tool/compat/input.sh",
+    "tool/compat/auth.sh"
+  ],
+  "provides": {
+    "tools": {
+      "redfish": {
+        "scope": "session",
+        "runtime": "bash",
+        "entry": "tool/entry.sh",
+        "requires": [
+          "target.ip"
+        ]
+      }
+    }
+  },
+  "systemDependencies": [
+    {
+      "id": "curl"
+    }
+  ]
+}
