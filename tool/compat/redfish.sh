@@ -20,15 +20,15 @@ _bmc_show_redfish_command() {
 _bmc_tool_redfish() {
     _bmc_secret_guard && _bmc_require_active || return
     local method=${1-} path=${2-} payload=${3-} kind=none raw code
-    (( $# >= 2 && $# <= 3 )) || { _bmc_error 'Use: redfish GET|POST|PATCH|DELETE /redfish/v1/... [JSON|@file]'; return 2; }
-    case $method in GET|POST|PATCH|DELETE) ;; *) _bmc_error 'Supported methods: GET POST PATCH DELETE (uppercase).'; return 2;; esac
-    case $path in /redfish/v1|/redfish/v1/|/redfish/v1/*) ;; *) _bmc_error 'Use a path within /redfish/v1/ on the active device.'; return 2;; esac
-    [[ $path != *[[:space:][:cntrl:]]* && $path != *'#'* && $path != *'\'* && $path != *'/../'* && $path != */.. ]] || { _bmc_error 'Invalid Redfish path.'; return 2; }
+    (( $# >= 2 && $# <= 3 )) || { _bmc_error '请提供 HTTP 方法和 Redfish 路径。运行 redfish --help 可查看用法。'; return 2; }
+    case $method in GET|POST|PATCH|DELETE) ;; *) _bmc_error 'HTTP 方法必须为大写的 GET、POST、PATCH 或 DELETE。'; return 2;; esac
+    case $path in /redfish/v1|/redfish/v1/|/redfish/v1/*) ;; *) _bmc_error '请使用当前 BMC 上的 /redfish/v1 路径或其子路径。'; return 2;; esac
+    [[ $path != *[[:space:][:cntrl:]]* && $path != *'#'* && $path != *'\'* && $path != *'/../'* && $path != */.. ]] || { _bmc_error 'Redfish 路径无效。请检查空白字符、片段标识、反斜杠和上级目录。'; return 2; }
     if (( $# == 3 )); then
-        [[ $method != GET ]] || { _bmc_error 'GET requests cannot have a body.'; return 2; }
+        [[ $method != GET ]] || { _bmc_error 'GET 请求只接受路径参数。'; return 2; }
         if [[ $payload == @* ]]; then
             kind=file; payload=${payload#@}
-            [[ -f $payload && -r $payload ]] || { _bmc_error 'Request body file is not readable.'; return 2; }
+            [[ -f $payload && -r $payload ]] || { _bmc_error '无法读取请求体文件。'; return 2; }
         else kind=inline; fi
     fi
     _bmc_settings_valid || return
@@ -36,7 +36,7 @@ _bmc_tool_redfish() {
     raw=$(_bmc_http "$_BMC_IP" "$_BMC_TLS" "$method" "$path" "$_BMC_USER" "$_BMC_PASSWORD" "$kind" "$payload") || return
     code=${raw%%$'\n'*}
     printf '%s\n' "${raw#*$'\n'}"
-    case $code in 2??) return 0 ;; *) _bmc_error "Redfish HTTP $code (response printed above); request was not retried."; return 22 ;; esac
+    case $code in 2??) return 0 ;; *) _bmc_error "Redfish 请求返回 HTTP $code。上方已输出响应内容，本次请求未重试。"; return 22 ;; esac
 }
 
 
@@ -68,12 +68,12 @@ _bmc_verify_redfish() (
     case $code in
         200)
             if printf '%s' "$body" | _bmc_json "$backend" accounts; then return 0; fi
-            _bmc_error 'HTTP 200 did not contain the expected protected Accounts collection; verification failed.'; return 3
+            _bmc_error 'HTTP 200 响应缺少预期的受保护 Accounts 集合，验证失败。'; return 3
             ;;
-        401) _bmc_error 'Redfish rejected authentication (401); account state is unknown.'; return 1 ;;
-        403) _bmc_error 'Redfish denied access (403); privileges/account state are unknown.'; return 3 ;;
-        404|405|501) _bmc_error 'Protected Redfish verification is unsupported here. If appropriate, retry explicitly with --verify ipmi.'; return 3 ;;
-        *) _bmc_error "Redfish verification failed (HTTP $code); no automatic credential retries."; return 3 ;;
+        401) _bmc_error 'Redfish 认证失败（HTTP 401），账号状态未知。'; return 1 ;;
+        403) _bmc_error 'Redfish 拒绝访问（HTTP 403），权限及账号状态未知。'; return 3 ;;
+        404|405|501) _bmc_error '设备不支持受保护的 Redfish 验证。适用时可显式选择 --verify ipmi。'; return 3 ;;
+        *) _bmc_error "Redfish 验证失败（HTTP $code），未自动重试凭据。"; return 3 ;;
     esac
 )
 

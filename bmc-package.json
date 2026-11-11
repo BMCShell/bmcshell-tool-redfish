@@ -8,7 +8,7 @@
   "displayName": "BMCShell Redfish",
   "description": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
   "summary": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": "https://github.com/BMCShell/bmcshell-tool-redfish",
   "coreApi": 1,
   "platforms": [

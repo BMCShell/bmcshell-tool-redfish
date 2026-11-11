@@ -6,10 +6,10 @@
 
 ```bash
 bmc plugin install --file .
-bmc help tool redfish --usage
+bmc tool redfish --help
 bmc use 192.0.2.10
 redfish --auth
-bmc tool redfish
+redfish --help
 ```
 
 工具随目标会话激活。系统依赖为 `curl`。代理由 `bmc proxy` 管理。发布时在本仓运行 `pwsh -File ./scripts/pack-release.ps1`，输出 `bmcshell-tool-redfish@<version>.zip` 和 SHA256 清单。

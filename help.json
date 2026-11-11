@@ -1,45 +1,70 @@
 {
   "topics": {
     "package": {
-      "summary": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
+      "summary": "向当前 BMC 发送 Redfish 请求并输出响应。",
       "usage": [
         "bmc use <IPv4>",
-        "bmc tool redfish"
+        "bmc tool redfish --help"
       ],
       "examples": [
         {
-          "command": "bmc tool redfish",
-          "description": "查看详细说明和示例。"
+          "command": "redfish GET /redfish/v1/Managers",
+          "description": "选中目标并配置凭据后读取管理器集合。"
         }
       ],
       "notes": [
-        "使用 redfish --auth 为当前目标交互配置会话凭据。",
-        "本工具遵循 BMCShell 的 SOCKS5 代理设置。"
+        "使用 redfish --auth 输入会话凭据。需要 PATH 中的 curl，代理由 bmc proxy 管理。"
       ]
     },
     "tool.redfish": {
-      "summary": "向当前 BMC 的 Redfish 服务发送请求。",
+      "summary": "向当前 BMC 的 Redfish 服务发送 HTTPS 请求。",
       "usage": [
-        "redfish GET /redfish/v1/...",
-        "redfish POST|PATCH|DELETE /redfish/v1/... [JSON|@文件]",
-        "redfish --auth [--tls-insecure|--clear]"
+        "redfish GET <路径>",
+        "redfish POST|PATCH|DELETE <路径> [JSON|@文件]",
+        "redfish --auth [--tls-insecure]",
+        "redfish --auth --clear"
       ],
-      "options": [],
+      "options": [
+        {
+          "name": "<路径>",
+          "description": "使用 /redfish/v1 或其子路径，方法名区分大小写。"
+        },
+        {
+          "name": "JSON|@文件",
+          "description": "将内联 JSON 作为一个参数传入，或用 @文件 从磁盘读取请求体。"
+        },
+        {
+          "name": "--auth",
+          "description": "从终端读取当前会话的用户名和密码，凭据由实际工具请求验证。"
+        },
+        {
+          "name": "--tls-insecure",
+          "description": "与 redfish --auth 一起使用，允许同一会话的 Redfish 请求跳过 HTTPS 证书校验。",
+          "default": "校验证书"
+        },
+        {
+          "name": "--clear",
+          "description": "清除当前会话的登录凭据及 TLS 设置。"
+        }
+      ],
       "examples": [
+        {
+          "command": "redfish --auth",
+          "description": "交互配置当前 BMC 的登录凭据。"
+        },
         {
           "command": "redfish GET /redfish/v1/Managers",
           "description": "读取管理器集合。"
         },
         {
-          "command": "redfish PATCH /redfish/v1/Managers/1 @request.json",
-          "description": "从文件读取请求体并发送修改请求。"
+          "command": "redfish GET /redfish/v1",
+          "description": "查看 Redfish 服务根资源。"
         }
       ],
       "notes": [
-        "方法使用大写。路径限定在当前目标的 /redfish/v1/。GET 只接收路径。",
-        "终端输出响应体。非 2xx HTTP 响应保留错误状态和响应内容。",
-        "用户名和密码通过 curl 的标准输入传递。HTTPS 默认证书校验。",
-        "认证配置保存在当前会话内存。--clear 清除已配置凭据。"
+        "POST、PATCH 和 DELETE 可能修改设备状态。发送前请按目标接口核对请求体与路径。",
+        "响应体写到标准输出。收到非 2xx 状态时，同时在标准错误报告 HTTP 状态码，退出码为 22。",
+        "连接超时默认 5 秒，请求超时默认 15 秒。可通过 BMC_CONNECT_TIMEOUT 和 BMC_HTTP_TIMEOUT 设置 1 至 999 秒。响应大小上限为 2 MiB。"
       ]
     }
   }

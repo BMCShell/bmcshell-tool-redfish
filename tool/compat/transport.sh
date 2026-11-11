@@ -40,13 +40,13 @@ _bmc_http() (
             else printf 'data-binary = "%s"\n' "$(_bmc_curl_quote "$data")"; fi
         fi
     } | command curl "${opts[@]}" --config - --request "$method" --output "$dir/body" --write-out '%{http_code}' "https://$ip$path"); then
-        [[ $code =~ ^[0-9]{3}$ ]] || { _bmc_error 'Invalid curl HTTP status.'; return 2; }
+        [[ $code =~ ^[0-9]{3}$ ]] || { _bmc_error 'curl 返回的 HTTP 状态码无效。'; return 2; }
         bytes=$(wc -c < "$dir/body") || return
-        (( bytes <= 2097152 )) || { _bmc_error 'HTTP response exceeds the 2 MiB limit.'; return 63; }
+        (( bytes <= 2097152 )) || { _bmc_error 'HTTP 响应超过 2 MiB 上限。'; return 63; }
         printf '%s\n' "$code"
         cat -- "$dir/body"
     else
-        rc=$?; _bmc_error "HTTPS transport failed (curl $rc). Check connectivity, TLS trust and timeouts; credentials were not classified as invalid."
+        rc=$?; _bmc_error "HTTPS 传输失败（curl 退出码 $rc），凭据验证结果未知。请检查网络连接、TLS 证书信任及超时设置。"
         return "$rc"
     fi
 )
