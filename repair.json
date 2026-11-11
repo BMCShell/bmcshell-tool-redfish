@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "suggestions": [
+    {
+      "dependency": "curl",
+      "suggestion": "在 MSYS2 中可安装 curl 软件包。使用其他终端时，请确认已安装的 curl 可通过当前终端的 PATH 找到。",
+      "platform": "windows-amd64",
+      "manager": "msys2",
+      "package": "msys/curl"
+    }
+  ]
+}
