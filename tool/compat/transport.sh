@@ -9,12 +9,23 @@ _bmc_curl_quote() {
 
 _bmc_curl_options() {
     local proxy_address
+    local connect_timeout=${BMC_CONNECT_TIMEOUT:-${BMCSHELL_REDFISH_CONNECT_TIMEOUT:-5}}
+    local request_timeout=${BMC_HTTP_TIMEOUT:-${BMCSHELL_REDFISH_REQUEST_TIMEOUT:-15}}
+    local ca_bundle=${BMC_CA_BUNDLE:-${BMCSHELL_REDFISH_CA_BUNDLE-}}
+    if [[ ! $connect_timeout =~ ^[1-9][0-9]{0,2}$ || ! $request_timeout =~ ^[1-9][0-9]{0,2}$ ]]; then
+        _bmc_error '连接和请求超时必须为 1 至 999 秒的整数。'
+        return 2
+    fi
+    if [[ -n $ca_bundle && ( $ca_bundle == *[[:cntrl:]]* || ! -f $ca_bundle || ! -r $ca_bundle ) ]]; then
+        _bmc_error '无法读取设置中的 CA 证书文件。'
+        return 2
+    fi
     proxy_address=$(_bmcshell_bridge proxy-address) || return
-    opts=(--disable --silent --show-error --globoff --proto '=https' --connect-timeout "${BMC_CONNECT_TIMEOUT:-5}" --max-time "${BMC_HTTP_TIMEOUT:-15}" --max-filesize 2097152)
+    opts=(--disable --silent --show-error --globoff --proto '=https' --connect-timeout "$connect_timeout" --max-time "$request_timeout" --max-filesize 2097152)
     if [[ -n $proxy_address ]]; then opts+=(--proxy "socks5h://$proxy_address" --noproxy '')
     else opts+=(--proxy '' --noproxy '*'); fi
     [[ $1 == insecure ]] && opts+=(-k)
-    [[ -n ${BMC_CA_BUNDLE-} ]] && opts+=(--cacert "$BMC_CA_BUNDLE")
+    [[ -n $ca_bundle ]] && opts+=(--cacert "$ca_bundle")
     return 0
 }
 

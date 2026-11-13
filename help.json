@@ -64,7 +64,8 @@
       "notes": [
         "POST、PATCH 和 DELETE 可能修改设备状态。发送前请按目标接口核对请求体与路径。",
         "响应体写到标准输出。收到非 2xx 状态时，同时在标准错误报告 HTTP 状态码，退出码为 22。",
-        "连接超时默认 5 秒，请求超时默认 15 秒。可通过 BMC_CONNECT_TIMEOUT 和 BMC_HTTP_TIMEOUT 设置 1 至 999 秒。响应大小上限为 2 MiB。"
+        "连接超时默认 5 秒，请求超时默认 15 秒。可在设置中心配置 1 至 999 秒的超时和 CA 证书文件。已有 BMC_CONNECT_TIMEOUT、BMC_HTTP_TIMEOUT 和 BMC_CA_BUNDLE 环境变量优先。",
+        "响应大小上限为 2 MiB。"
       ]
     }
   }

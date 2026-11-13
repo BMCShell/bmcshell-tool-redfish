@@ -31,7 +31,6 @@ _bmc_tool_redfish() {
             [[ -f $payload && -r $payload ]] || { _bmc_error '无法读取请求体文件。'; return 2; }
         else kind=inline; fi
     fi
-    _bmc_settings_valid || return
     _bmc_show_redfish_command "$method" "$path" "$kind" "$payload"
     raw=$(_bmc_http "$_BMC_IP" "$_BMC_TLS" "$method" "$path" "$_BMC_USER" "$_BMC_PASSWORD" "$kind" "$payload") || return
     code=${raw%%$'\n'*}

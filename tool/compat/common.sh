@@ -29,12 +29,3 @@ _bmc_ipv4_valid() {
 _bmc_credentials_valid() {
     [[ -n $1 && -n $2 && ${#1} -le 128 && ${#2} -le 4096 && $1 != *:* && $1 != *[[:cntrl:]]* && $2 != *[[:cntrl:]]* ]]
 }
-
-_bmc_settings_valid() {
-    [[ ${BMC_CONNECT_TIMEOUT:-5} =~ ^[1-9][0-9]{0,2}$ && ${BMC_HTTP_TIMEOUT:-15} =~ ^[1-9][0-9]{0,2}$ ]] || {
-        _bmc_error '连接和请求超时必须为 1 至 999 秒的整数。'; return 2;
-    }
-    [[ -z ${BMC_CA_BUNDLE-} || -r $BMC_CA_BUNDLE ]] || {
-        _bmc_error '无法读取 BMC_CA_BUNDLE 指定的 CA 证书文件。'; return 2;
-    }
-}

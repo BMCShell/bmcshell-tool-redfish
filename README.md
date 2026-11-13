@@ -13,3 +13,10 @@ redfish --help
 ```
 
 工具随目标会话激活。系统依赖为 `curl`。代理由 `bmc proxy` 管理。发布时在本仓运行 `pwsh -File ./scripts/pack-release.ps1`，输出 `bmcshell-tool-redfish@<version>.zip` 和 SHA256 清单。
+
+`bmc setting` 的「插件设置 → 工具 → redfish」可以设置连接超时、请求超时和 CA 证书文件。超时默认分别为 5 秒和 15 秒，允许 1 至 999 秒。证书设置保存 PEM 文件路径，留空时由 curl 使用默认信任配置。已有的 `BMC_CONNECT_TIMEOUT`、`BMC_HTTP_TIMEOUT` 和 `BMC_CA_BUNDLE` 环境变量优先。
+
+```bash
+bmc setting --set plugin.bmcshell-tool-redfish.connect_timeout 10
+bmc setting --set plugin.bmcshell-tool-redfish.request_timeout 30 --reload
+```
