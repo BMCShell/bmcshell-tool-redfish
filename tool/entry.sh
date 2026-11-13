@@ -12,14 +12,16 @@ _bmcshell_v2tools_read_auth() (
 )
 
 _bmcshell_v2tools_auth() {
-    local root=$1 tool=$2 tls=verify
+    local root=$1 tool=$2 tls=''
     local +x payload
     shift 2
     case $#:${1-} in
         0:) ;;
         1:--tls-insecure) tls=insecure ;;
+        1:--tls-verify) tls=verify ;;
         1:--clear)
-            builtin unset '_BMCSHELL_SESSION_STATE[v2.user]' '_BMCSHELL_SESSION_STATE[v2.password]' '_BMCSHELL_SESSION_STATE[v2.tls]'
+            builtin unset '_BMCSHELL_SESSION_STATE[v2.user]' '_BMCSHELL_SESSION_STATE[v2.password]' \
+                '_BMCSHELL_SESSION_STATE[v2.tls]' '_BMCSHELL_SESSION_STATE[redfish.tls]'
             builtin printf '已清除当前会话手动设置的登录凭据。\n'
             return 0
             ;;
@@ -28,7 +30,12 @@ _bmcshell_v2tools_auth() {
     payload=$(_bmcshell_v2tools_read_auth "$root") || return
     _BMCSHELL_SESSION_STATE[v2.user]=${payload%%$'\n'*}
     _BMCSHELL_SESSION_STATE[v2.password]=${payload#*$'\n'}
-    _BMCSHELL_SESSION_STATE[v2.tls]=$tls
+    builtin unset '_BMCSHELL_SESSION_STATE[v2.tls]'
+    if [[ -n $tls ]]; then
+        _BMCSHELL_SESSION_STATE[redfish.tls]=$tls
+    else
+        builtin unset '_BMCSHELL_SESSION_STATE[redfish.tls]'
+    fi
     builtin printf '登录凭据已保存到当前会话，将在工具请求时使用。\n'
 }
 
@@ -77,7 +84,12 @@ _bmcshell_v2tools_snmp_setup() {
 
 _bmcshell_v2tools_run() (
     local _BMC_INSTALL_DIR=$1 tool=$2 _BMC_IP=$3 _BMC_ACTIVE=1
-    local _BMC_TLS=${_BMCSHELL_SESSION_STATE[v2.tls]:-verify} _BMC_PLATFORM_NOTE=''
+    local _BMC_TLS=${BMCSHELL_TLS_MODE:-verify} _BMC_PLATFORM_NOTE=''
+    # Other legacy auth tools write verify even when the user did not choose a TLS mode.
+    if [[ ${_BMCSHELL_SESSION_STATE[v2.tls]-} == insecure ]]; then
+        _BMC_TLS=insecure
+    fi
+    _BMC_TLS=${_BMCSHELL_SESSION_STATE[redfish.tls]:-$_BMC_TLS}
     local +x _BMC_USER=${_BMCSHELL_SESSION_STATE[v2.user]-} _BMC_PASSWORD=${_BMCSHELL_SESSION_STATE[v2.password]-}
     local arg implementation
     shift 3

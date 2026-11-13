@@ -21,7 +21,7 @@
       "usage": [
         "redfish GET <路径>",
         "redfish POST|PATCH|DELETE <路径> [JSON|@文件]",
-        "redfish --auth [--tls-insecure]",
+        "redfish --auth [--tls-verify|--tls-insecure]",
         "redfish --auth --clear"
       ],
       "options": [
@@ -38,9 +38,12 @@
           "description": "从终端读取当前会话的用户名和密码，凭据由实际工具请求验证。"
         },
         {
+          "name": "--tls-verify",
+          "description": "与 redfish --auth 一起使用，为当前会话的 Redfish 请求开启 HTTPS 证书校验。"
+        },
+        {
           "name": "--tls-insecure",
-          "description": "与 redfish --auth 一起使用，允许同一会话的 Redfish 请求跳过 HTTPS 证书校验。",
-          "default": "校验证书"
+          "description": "与 redfish --auth 一起使用，为当前会话的 Redfish 请求跳过 HTTPS 证书校验。"
         },
         {
           "name": "--clear",
@@ -62,6 +65,7 @@
         }
       ],
       "notes": [
+        "Redfish 请求继承框架的 TLS 证书校验设置。直接运行 redfish --auth 恢复继承框架设置。",
         "POST、PATCH 和 DELETE 可能修改设备状态。发送前请按目标接口核对请求体与路径。",
         "响应体写到标准输出。收到非 2xx 状态时，同时在标准错误报告 HTTP 状态码，退出码为 22。",
         "连接超时默认 5 秒，请求超时默认 15 秒。可在设置中心配置 1 至 999 秒的超时和 CA 证书文件。已有 BMC_CONNECT_TIMEOUT、BMC_HTTP_TIMEOUT 和 BMC_CA_BUNDLE 环境变量优先。",

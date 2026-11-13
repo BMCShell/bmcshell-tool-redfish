@@ -8,7 +8,7 @@
   "displayName": "BMCShell Redfish",
   "description": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
   "summary": "对当前目标执行 Redfish 请求，支持 JSON 和请求体文件。",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "repository": "https://github.com/BMCShell/bmcshell-tool-redfish",
   "coreApi": 1,
   "platforms": [
@@ -43,7 +43,7 @@
       "key": "ca_bundle",
       "path": "tools.redfish",
       "label": "CA 证书文件",
-      "hint": "指定用于验证 Redfish HTTPS 连接的 PEM 证书文件路径。留空时由 curl 使用默认信任配置。",
+      "hint": "开启 TLS 校验时，curl 使用指定的 PEM 证书文件。留空时使用默认信任配置。",
       "type": "string",
       "default": "",
       "env": "BMCSHELL_REDFISH_CA_BUNDLE"

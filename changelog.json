@@ -1,6 +1,13 @@
 {
   "releases": [
     {
+      "version": "1.0.4",
+      "date": "2026-11-13",
+      "changes": [
+        "继承框架 TLS 证书校验设置，并支持 redfish --auth 显式覆盖当前会话的设置。"
+      ]
+    },
+    {
       "version": "1.0.3",
       "date": "2026-11-13",
       "changes": [
